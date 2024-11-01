@@ -1,36 +1,44 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main extends JFrame{
     private JPanel MainForm;
-    private JButton clickMeButton;
-    private JTextField caesarText;
-    private JLabel Label1;
-    private JLabel Label2;
-    private JTextField textField1;
+    private JButton encryptButton;
+    private JTextField cipherText;
+    private JLabel headerLabel;
+    private JLabel plainTextLabel;
+    private JTextField plainTextField;
     private JRadioButton caesarRadioButton;
     private JRadioButton onetimePadRadioButton;
     private JRadioButton playfairRadioButton;
+    private JRadioButton polybiusRadioButton;
+    private JRadioButton vigenereRadioButton;
+    private JTextField keyField;
+    private JButton decipherButton;
+    private JLabel keyLabel;
+    private JLabel cipherTextLabel;
     private String optionSelect = "";
 
     public Main()
     {
         setContentPane(MainForm);
-        setTitle("Simple GUI App");
+        setTitle("Encryption and Decryption");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(400, 200);
+        setSize(550, 350);
         setLocationRelativeTo(null);
         setVisible(true);
+
+        keyField.setEnabled(false);
 
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(caesarRadioButton);
         buttonGroup.add(onetimePadRadioButton);
         buttonGroup.add(playfairRadioButton);
+        buttonGroup.add(polybiusRadioButton);
+        buttonGroup.add(vigenereRadioButton);
 
-        clickMeButton.addActionListener(new ActionListener() {
+        encryptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                     cleanScreen();
@@ -45,40 +53,125 @@ public class Main extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "caesar";
+                keyField.setEnabled(false);
             }
         });
         onetimePadRadioButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "oneTimePad";
+                keyField.setEnabled(true);
             }
         });
         playfairRadioButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "playfair";
+                keyField.setEnabled(true);
+            }
+        });
+        vigenereRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionSelect = "Vigenere";
+                keyField.setEnabled(true);
+            }
+        });
+        polybiusRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionSelect = "Polybius";
+                keyField.setEnabled(false);
+            }
+        });
+        decipherButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                decrypt();
             }
         });
     }
 
     public void cleanScreen()
     {
-        caesarText.setText("");
+        cipherText.setText("");
     }
 
     public void encrypt()
     {
         if(optionSelect.equalsIgnoreCase("caesar"))
         {
-            caesarText.setText(Caesar.encrypt(textField1.getText().toUpperCase(), 3));
+            cipherText.setText(Caesar.encrypt(plainTextField.getText().toUpperCase(), 3));
         }
         else if (optionSelect.equalsIgnoreCase("oneTimePad"))
         {
-            caesarText.setText(OneTimePad.stringEncryption(textField1.getText().toUpperCase(), "MONEY"));
+            cipherText.setText(OneTimePad.stringEncryption(plainTextField.getText().toUpperCase(), keyField.getText().toUpperCase()));
+        }
+        else if(optionSelect.equalsIgnoreCase("playfair"))
+        {
+            String plaintext = plainTextField.getText();
+            String key = keyField.getText();
+            String preparedKey = Playfair.prepareText(key, true);
+            Playfair.createTable(preparedKey);
+            String preparedText = Playfair.prepareText(plaintext, false);
+            String encryptedText = Playfair.encode(preparedText);
+            cipherText.setText(encryptedText);
+        }
+        else if(optionSelect.equalsIgnoreCase("Vigenere"))
+        {
+            String Str = plainTextField.getText();
+            String Keyword = keyField.getText();
+
+            String str = Vigenere.LowerToUpper(Str);
+            String keyword = Vigenere.LowerToUpper(Keyword);
+
+            String key = Vigenere.generateKey(str, keyword);
+            String cipherText = Vigenere.cipherText(str, key);
+            this.cipherText.setText(cipherText);
+        }
+        else if(optionSelect.equalsIgnoreCase("Polybius"))
+        {
+            cipherText.setText(Polybious.polybiusCipher(plainTextField.getText()));
         }
     }
 
-    public static void main(String[] args) {
-        new Main();
+    public void decrypt()
+    {
+        if(optionSelect.equalsIgnoreCase("caesar"))
+        {
+            plainTextField.setText(Caesar.encrypt(cipherText.getText().toUpperCase(), -3));
+        }
+        else if (optionSelect.equalsIgnoreCase("oneTimePad"))
+        {
+            plainTextField.setText(OneTimePad.stringDecryption(cipherText.getText().toUpperCase(), keyField.getText().toUpperCase()));
+        }
+        else if(optionSelect.equalsIgnoreCase("playfair"))
+        {
+            String cipherText = this.cipherText.getText();
+            String key = keyField.getText();
+            String preparedKey = Playfair.prepareText(key, true);
+            Playfair.createTable(preparedKey);
+            String preparedText = Playfair.prepareText(cipherText, false);
+            String decryptedText = Playfair.decode(preparedText);
+            this.cipherText.setText(decryptedText);
+        }
+        else if(optionSelect.equalsIgnoreCase("Vigenere"))
+        {
+            String Str = cipherText.getText();
+            String Keyword = keyField.getText();
+
+            String str = Vigenere.LowerToUpper(Str);
+            String keyword = Vigenere.LowerToUpper(Keyword);
+
+            String key = Vigenere.generateKey(str, keyword);
+            String plainText = Vigenere.originalText(str, key);
+            this.plainTextField.setText(plainText);
+        }
+        else if(optionSelect.equalsIgnoreCase("Polybius"))
+        {
+            cipherText.setText(Polybious.polybiusCipher(plainTextField.getText()));
+        }
     }
+
+
 }
