@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,6 +19,7 @@ public class Main extends JFrame{
     private JButton decipherButton;
     private JLabel keyLabel;
     private JLabel cipherTextLabel;
+    private JButton resetButton;
     private String optionSelect = "";
 
     public Main()
@@ -30,6 +32,8 @@ public class Main extends JFrame{
         setVisible(true);
 
         keyField.setEnabled(false);
+        keyField.setToolTipText("Enter the key if needed");
+        keyField.setBackground(new Color(92, 91, 91));
 
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(caesarRadioButton);
@@ -54,6 +58,7 @@ public class Main extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "caesar";
                 keyField.setEnabled(false);
+                checkEnabled();
             }
         });
         onetimePadRadioButton.addActionListener(new ActionListener() {
@@ -61,6 +66,7 @@ public class Main extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "oneTimePad";
                 keyField.setEnabled(true);
+                checkEnabled();
             }
         });
         playfairRadioButton.addActionListener(new ActionListener() {
@@ -68,6 +74,7 @@ public class Main extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "playfair";
                 keyField.setEnabled(true);
+                checkEnabled();
             }
         });
         vigenereRadioButton.addActionListener(new ActionListener() {
@@ -75,6 +82,7 @@ public class Main extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "Vigenere";
                 keyField.setEnabled(true);
+                checkEnabled();
             }
         });
         polybiusRadioButton.addActionListener(new ActionListener() {
@@ -82,6 +90,7 @@ public class Main extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 optionSelect = "Polybius";
                 keyField.setEnabled(false);
+                checkEnabled();
             }
         });
         decipherButton.addActionListener(new ActionListener() {
@@ -90,6 +99,26 @@ public class Main extends JFrame{
                 decrypt();
             }
         });
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                plainTextField.setText("");
+                keyField.setText("");
+                cipherText.setText("");
+            }
+        });
+    }
+
+    public void checkEnabled()
+    {
+        if(!keyField.isEnabled())
+        {
+            keyField.setBackground(new Color(92, 91, 91));
+        }
+        else
+        {
+            keyField.setBackground(new Color(255, 255, 255));
+        }
     }
 
     public void cleanScreen()
@@ -172,6 +201,4 @@ public class Main extends JFrame{
             cipherText.setText(Polybious.polybiusCipher(plainTextField.getText()));
         }
     }
-
-
 }
